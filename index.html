@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sketch</title>
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+    <script src="libraries/p5.min.js"></script>
+    <script src="libraries/p5.sound.min.js"></script>
+    <style>
+      body {
+        background: url('畫布背景.jpg') no-repeat center center fixed;
+        background-size: cover;
+      }
+
+      .menu-container {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        gap: 10px;
+        z-index: 200; /* 確保選單在最上層 */
+        pointer-events: none; /* 預設禁用選單 */
+        opacity: 0.5; /* 選單半透明，表示不可用 */
+      }
+
+      .menu-item {
+        padding: 10px 20px;
+        background: #000;
+        color: #fff;
+        border-radius: 5px;
+        cursor: pointer;
+        position: relative; /* 設定相對定位，方便子選單定位 */
+      }
+
+      .submenu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: none; /* 預設隱藏子選單 */
+        position: absolute;
+        top: 100%; /* 子選單放在主選單項目下方 */
+        left: 0;
+        background: #000;
+        color: #fff;
+        border-radius: 5px;
+        flex-direction: column;
+        z-index: 10; /* 確保子選單在 iframe 上方 */
+      }
+
+      .submenu li {
+        padding: 10px 20px;
+        cursor: pointer;
+      }
+
+      .submenu li:hover {
+        background: #444;
+      }
+
+      .menu-item:hover .submenu {
+        display: block; /* 滑鼠移到主選單時顯示子選單 */
+      }
+
+      .intro-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #000;
+        color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        z-index: 300; /* 確保文字方塊在最上層 */
+        text-align: center;
+      }
+
+      .lock-screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 400; /* 確保鎖屏在最上層 */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        color: #fff;
+        font-size: 20px;
+      }
+
+      .lock-screen input {
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: none;
+        margin-top: 10px;
+      }
+
+      .lock-screen button {
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: none;
+        background: #28a745;
+        color: #fff;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+    </style>
+    <script>
+      const correctPassword = "1234"; // 正確密碼
+
+      function unlockScreen() {
+        const passwordInput = document.getElementById("passwordInput");
+        const lockScreen = document.getElementById("lockScreen");
+        const menuContainer = document.querySelector(".menu-container");
+
+        if (passwordInput.value === correctPassword) {
+          // 移除鎖屏
+          lockScreen.style.display = "none";
+
+          // 啟用選單
+          menuContainer.style.pointerEvents = "auto";
+          menuContainer.style.opacity = "1";
+        } else {
+          alert("密碼錯誤，請再試一次！");
+        }
+      }
+
+      function loadIframe(url) {
+        // 移除舊的內容
+        removeContent();
+
+        // 建立新的 iframe
+        const iframe = document.createElement('iframe');
+        iframe.id = 'contentIframe';
+        iframe.src = url;
+        iframe.style.position = 'absolute';
+        iframe.style.top = '100px'; // 調整位置，避免覆蓋選單
+        iframe.style.left = '15px';
+        iframe.style.width = 'calc(100% - 30px)';
+        iframe.style.height = 'calc(100% - 130px)'; // 減去選單的高度
+        iframe.style.border = 'none';
+        iframe.style.zIndex = '1'; // 設置 z-index，確保在背景和選單下方
+        document.body.appendChild(iframe);
+      }
+
+      function showIntroText() {
+        // 移除舊的內容
+        removeContent();
+
+        // 建立文字方塊
+        const introText = document.createElement('div');
+        introText.className = 'intro-text';
+        introText.textContent = '我是莊云溱，班級教科一Ａ，學號413730374，這是我的期中報告';
+        document.body.appendChild(introText);
+      }
+
+      function removeContent() {
+        // 移除 iframe
+        const existingIframe = document.getElementById('contentIframe');
+        if (existingIframe) {
+          existingIframe.remove();
+        }
+
+        // 移除文字方塊
+        const existingIntroText = document.querySelector('.intro-text');
+        if (existingIntroText) {
+          existingIntroText.remove();
+        }
+      }
+    </script>
+  </head>
+
+  <body>
+    <!-- 鎖屏畫面 -->
+    <div id="lockScreen" class="lock-screen">
+      <div>請輸入密碼以解鎖</div>
+      <input id="passwordInput" type="password" placeholder="輸入密碼" />
+      <button onclick="unlockScreen()">解鎖</button>
+    </div>
+
+    <!-- 選單容器 -->
+    <div class="menu-container">
+      <!-- 主選單項目 -->
+      <div class="menu-item" onclick="removeContent()">首頁</div>
+      <div class="menu-item" onclick="showIntroText()">自我介紹</div>
+      <div class="menu-item">
+        作品集
+        <!-- 子選單 -->
+        <ul class="submenu">
+          <li onclick="loadIframe('https://yunella77.github.io/20250314/')">第一週</li>
+          <li onclick="loadIframe('https://yunella77.github.io/20250328/')">第二週</li>
+        </ul>
+      </div>
+      <div class="menu-item" onclick="loadIframe('https://yunella77.github.io/20250321/')">測驗卷</div>
+      <div class="menu-item" onclick="loadIframe('https://reurl.cc/8D6zdX')">上課影片</div>
+    </div>
+  </body>
+</html>
